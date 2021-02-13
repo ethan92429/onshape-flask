@@ -1,8 +1,9 @@
-GitHub-Flask
+**UNDER DEVELOPMENT**
+
+Onshape-Flask
 ============
 
-GitHub-Flask is an extension for authenticating Flask applications with GitHub.
-It also provides support for various other requests to the GitHub API.
+Onshape-Flask is an extension for authenticating Flask applications with Onshape.
 Compatible with Python 2.7 and 3.4.
 
 .. image:: https://travis-ci.org/cenkalti/github-flask.svg?branch=master
