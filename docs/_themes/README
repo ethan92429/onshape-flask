@@ -27,5 +27,5 @@ The following options exist for the flask_small theme:
                                 to be used as replacement for the
                                 h1 in the index.rst file.
    index_logo_height = 120px    height of the index logo
-   github_fork = ''             repository name on github for the
+   onshape_fork = ''             repository name on onshape for the
                                 "fork me" badge

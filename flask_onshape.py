@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-    GitHub-Flask
+    Onshape-Flask
     ============
 
-    Authenticate users in your Flask app with GitHub.
+    Authenticate users in your Flask app with Onshape.
 
 """
 import logging
@@ -50,8 +50,8 @@ def is_json_response(response):
     return content_type == 'application/json' or content_type.startswith('application/json;')
 
 
-class GitHubError(Exception):
-    """Raised if a request fails to the GitHub API."""
+class OnshapeError(Exception):
+    """Raised if a request fails to the Onshape API."""
 
     def __str__(self):
         try:
@@ -66,14 +66,14 @@ class GitHubError(Exception):
         return self.args[0]
 
 
-class GitHub(object):
+class Onshape(object):
     """
-    Provides decorators for authenticating users with GitHub within a Flask
-    application. Helper methods are also provided interacting with GitHub API.
+    Provides decorators for authenticating users with Onshape within a Flask
+    application. Helper methods are also provided interacting with Onshape API.
 
     """
-    BASE_URL = 'https://api.github.com/'
-    BASE_AUTH_URL = 'https://github.com/login/oauth/'
+    BASE_URL = 'https://cad.onshape.com/api/'
+    BASE_AUTH_URL = 'https://oauth.onshape.com/oauth/'
 
     def __init__(self, app=None):
         if app is not None:
@@ -83,16 +83,16 @@ class GitHub(object):
             self.app = None
 
     def init_app(self, app):
-        self.client_id = app.config['GITHUB_CLIENT_ID']
-        self.client_secret = app.config['GITHUB_CLIENT_SECRET']
-        self.base_url = app.config.get('GITHUB_BASE_URL', self.BASE_URL)
-        self.auth_url = app.config.get('GITHUB_AUTH_URL', self.BASE_AUTH_URL)
+        self.client_id = app.config['ONSHAPE_CLIENT_ID']
+        self.client_secret = app.config['ONSHAPE_CLIENT_SECRET']
+        self.base_url = app.config.get('ONSHAPE_BASE_URL', self.BASE_URL)
+        self.auth_url = app.config.get('ONSHAPE_AUTH_URL', self.BASE_AUTH_URL)
         self.session = requests.session()
 
     def access_token_getter(self, f):
         """
         Registers a function as the access_token getter. Must return the
-        access_token used to make requests to GitHub on the user's behalf.
+        access_token used to make requests to Onshape on the user's behalf.
 
         """
         self.get_access_token = f
@@ -103,7 +103,7 @@ class GitHub(object):
 
     def authorize(self, scope=None, redirect_uri=None, state=None):
         """
-        Redirect to GitHub and request access to a user's data.
+        Redirect to Onshape and request access to a user's data.
 
         :param scope: List of `Scopes`_ for which to request access, formatted
                       as a string or comma delimited list of scopes as a
@@ -111,19 +111,19 @@ class GitHub(object):
                       read-only access to public information (includes public
                       user profile info, public repository info, and gists).
                       For more information on this, see the examples in
-                      presented in the GitHub API `Scopes`_ documentation, or
+                      presented in the Onshape API `Scopes`_ documentation, or
                       see the examples provided below.
         :type scope: str
         :param redirect_uri: `Redirect URL`_ to which to redirect the user
                              after authentication. Defaults to ``None``,
                              resulting in using the default redirect URL for
-                             the OAuth application as defined in GitHub.  This
+                             the OAuth application as defined in Onshape.  This
                              URL can differ from the callback URL defined in
-                             your GitHub application, however it must be a
+                             your Onshape application, however it must be a
                              subdirectory of the specified callback URL,
-                             otherwise raises a :class:`GitHubError`.  For more
+                             otherwise raises a :class:`OnshapeError`.  For more
                              information on this, see the examples in presented
-                             in the GitHub API `Redirect URL`_ documentation,
+                             in the Onshape API `Redirect URL`_ documentation,
                              or see the example provided below.
         :type redirect_uri: str
         :param state: An unguessable random string. It is used to protect
@@ -137,7 +137,7 @@ class GitHub(object):
 
         .. code-block:: python
 
-            github.authorize(scope="user,repo")
+            onshape.authorize(scope="user,repo")
 
         Additionally, if we wanted to specify a different redirect URL
         following authorization.
@@ -147,11 +147,11 @@ class GitHub(object):
             # Our application's callback URL is "http://example.com/callback"
             redirect_uri="http://example.com/callback/my/path"
 
-            github.authorize(scope="user,repo", redirect_uri=redirect_uri)
+            onshape.authorize(scope="user,repo", redirect_uri=redirect_uri)
 
 
-        .. _Scopes: https://developer.github.com/v3/oauth/#scopes
-        .. _Redirect URL: https://developer.github.com/v3/oauth/#redirect-urls
+        .. _Scopes: https://developer.onshape.com/v3/oauth/#scopes
+        .. _Redirect URL: https://developer.onshape.com/v3/oauth/#redirect-urls
 
         """
         _logger.debug("Called authorize()")
@@ -162,7 +162,7 @@ class GitHub(object):
             params['redirect_uri'] = redirect_uri
         if state:
             params['state'] = state
-
+        params["response_type"] = "code"
         url = self.auth_url + 'authorize?' + urlencode(params)
         _logger.debug("Redirecting to %s", url)
         return redirect(url)
@@ -170,7 +170,7 @@ class GitHub(object):
     def authorized_handler(self, f):
         """
         Decorator for the route that is used as the callback for authorizing
-        with GitHub. This callback URL can be set in the settings for the app
+        with Onshape. This callback URL can be set in the settings for the app
         or passed in during authorization.
 
         """
@@ -185,30 +185,26 @@ class GitHub(object):
 
     def _handle_response(self):
         """
-        Handles response after the redirect to GitHub. This response
+        Handles response after the redirect to Onshape. This response
         determines if the user has allowed the this application access. If we
         were then we send a POST request for the access_key used to
-        authenticate requests to GitHub.
+        authenticate requests to Onshape.
 
         """
-        _logger.debug("Handling response from GitHub")
+        _logger.debug("Handling response from Onshape")
         params = {
             'code': request.args.get('code'),
             'client_id': self.client_id,
-            'client_secret': self.client_secret
+            'client_secret': self.client_secret,
+            'grant_type' : "authorization_code"
         }
-        url = self.auth_url + 'access_token'
+        url = self.auth_url + 'token'
         _logger.debug("POSTing to %s", url)
         _logger.debug(params)
         response = self.session.post(url, data=params)
-        data = parse_qs(response.content)
+        data = json.loads(response.content)
         _logger.debug("response.content = %s", data)
-        for k, v in data.items():
-            if len(v) == 1:
-                data[k] = v[0]
-        token = data.get(b'access_token', None)
-        if token is not None:
-            token = token.decode('ascii')
+        token = data.get("access_token", None)
         return token
 
     def _handle_invalid_response(self):
@@ -259,7 +255,7 @@ class GitHub(object):
         response = self.raw_request(method, resource, **kwargs)
 
         if not is_valid_response(response):
-            raise GitHubError(response)
+            raise OnshapeError(response)
 
         if is_json_response(response):
             result = response.json()
@@ -268,14 +264,14 @@ class GitHub(object):
                 response = self.raw_request(method, url, **kwargs)
                 if not is_valid_response(response) or \
                         not is_json_response(response):
-                    raise GitHubError(response)
+                    raise OnshapeError(response)
                 body = response.json()
                 if isinstance(body, list):
                     result += body
                 elif isinstance(body, dict) and 'items' in body:
                     result['items'] += body['items']
                 else:
-                    raise GitHubError(response)
+                    raise OnshapeError(response)
             return result
         else:
             return response

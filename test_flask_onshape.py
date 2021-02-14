@@ -5,15 +5,15 @@ import requests
 from mock import patch, Mock
 
 from flask import Flask, request, redirect
-from flask_github import GitHub
+from flask_onshape import Onshape
 
 logger = logging.getLogger(__name__)
 
 
-class GitHubTestCase(unittest.TestCase):
+class OnshapeTestCase(unittest.TestCase):
 
     @patch.object(requests.Session, 'post')
-    @patch.object(GitHub, 'BASE_AUTH_URL')
+    @patch.object(Onshape, 'BASE_AUTH_URL')
     def test_authorization(self, auth_url, post):
         def assert_params(*args, **kwargs):
             data = kwargs.pop('data')
@@ -21,30 +21,30 @@ class GitHubTestCase(unittest.TestCase):
             assert data['client_secret'] == 'SEKRET'
             assert data['code'] == 'KODE'
             response = Mock()
-            response.content = b'access_token=asdf&token_type=bearer'
+            response.content = '{"access_token":"asdf","token_type":"bearer"}'
             return response
         post.side_effect = assert_params
         auth_url.__get__ = Mock(return_value='http://localhost/oauth/')
 
         app = Flask(__name__)
 
-        app.config['GITHUB_CLIENT_ID'] = '123'
-        app.config['GITHUB_CLIENT_SECRET'] = 'SEKRET'
+        app.config['ONSHAPE_CLIENT_ID'] = '123'
+        app.config['ONSHAPE_CLIENT_SECRET'] = 'SEKRET'
 
-        github = GitHub(app)
+        onshape = Onshape(app)
 
         @app.route('/login')
         def login():
-            return github.authorize(redirect_uri="http://localhost/callback")
+            return onshape.authorize(redirect_uri="http://localhost/callback")
 
         @app.route('/callback')
-        @github.authorized_handler
+        @onshape.authorized_handler
         def authorized(token):
             access_token.append(token)
             return ''
 
-        # Mimics GitHub authorization URL
-        # http://developer.github.com/v3/oauth/#web-application-flow
+        # Mimics Onshape authorization URL
+        # https://onshape-public.onshape.io/docs/oauth/
         @app.route('/oauth/authorize')
         def handle_auth():
             logger.info("in /oauth/authorize")

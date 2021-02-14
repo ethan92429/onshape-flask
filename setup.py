@@ -1,15 +1,8 @@
 """
-GitHub-Flask
+Onshape-Flask
 ------------
 
-Adds support to authorize users with GitHub and make API requests with Flask.
-
-Links
-`````
-
-* `documentation <http://github-flask.readthedocs.org>`_
-* `development version
-  <http://github.com/cenkalti/github-flask/zipball/master#egg=GitHub-Flask-dev>`_
+Adds support to authorize users with Onshape and make API requests with Flask.
 
 """
 import os
@@ -24,7 +17,7 @@ def read(*fname):
 
 
 def get_version():
-    for line in read('flask_github.py').splitlines():
+    for line in read('flask_onshape.py').splitlines():
         m = re.match(r"__version__\s*=\s'(.*)'", line)
         if m:
             return m.groups()[0].strip()
@@ -32,16 +25,16 @@ def get_version():
 
 
 setup(
-    name='GitHub-Flask',
+    name='Onshape-Flask',
     version=get_version(),
-    url='http://github.com/cenkalti/github-flask',
+    url='http://onshape.com/ethan92429/onshape-flask',
     license='MIT',
-    author='Cenk Alti',
-    author_email='cenkalti@gmail.com',
-    description='GitHub extension for Flask microframework',
+    author='Ethan Keller',
+    author_email='ekeller@gmail.com',
+    description='Onshape extension for Flask microframework',
     long_description=__doc__,
-    py_modules=['flask_github'],
-    test_suite='test_flask_github',
+    py_modules=['flask_onshape'],
+    test_suite='test_flask_onshape',
     zip_safe=False,
     include_package_data=True,
     platforms='any',

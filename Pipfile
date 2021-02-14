@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+onshape-flask = {editable = true, path = "."}
+
+[dev-packages]
+nose = "*"
+mock = "*"
+
+[requires]
+python_version = "3.9"

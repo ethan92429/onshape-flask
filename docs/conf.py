@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# GitHub-Flask documentation build configuration file, created by
+# Onshape-Flask documentation build configuration file, created by
 # sphinx-quickstart on Tue Jul  9 21:24:46 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -19,7 +19,7 @@ import sys, os
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('_themes'))
 
-import flask_github
+import flask_onshape
 
 # -- General configuration -----------------------------------------------------
 
@@ -47,7 +47,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'GitHub-Flask'
+project = u'Onshape-Flask'
 copyright = u'2013, Cenk Altı'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -55,7 +55,7 @@ copyright = u'2013, Cenk Altı'
 # built documents.
 #
 # The short X.Y version.
-version = flask_github.__version__
+version = flask_onshape.__version__
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -107,8 +107,8 @@ html_theme = 'flask_small'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'index_logo': 'github-flask.png',
-    'github_fork': 'cenkalti/github-flask'
+    'index_logo': 'onshape-flask.png',
+    'onshape_fork': 'cenkalti/onshape-flask'
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -116,7 +116,7 @@ html_theme_path = ['_themes']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = 'GitHub-Flask'
+html_title = 'Onshape-Flask'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -177,7 +177,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'GitHub-Flaskdoc'
+htmlhelp_basename = 'Onshape-Flaskdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -196,7 +196,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'GitHub-Flask.tex', u'GitHub-Flask Documentation',
+  ('index', 'Onshape-Flask.tex', u'Onshape-Flask Documentation',
    u'Cenk Altı', 'manual'),
 ]
 
@@ -226,7 +226,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'github-flask', u'GitHub-Flask Documentation',
+    ('index', 'onshape-flask', u'Onshape-Flask Documentation',
      [u'Cenk Altı'], 1)
 ]
 
@@ -240,8 +240,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'GitHub-Flask', u'GitHub-Flask Documentation',
-   u'Cenk Altı', 'GitHub-Flask', 'One line description of project.',
+  ('index', 'Onshape-Flask', u'Onshape-Flask Documentation',
+   u'Cenk Altı', 'Onshape-Flask', 'One line description of project.',
    'Miscellaneous'),
 ]
 

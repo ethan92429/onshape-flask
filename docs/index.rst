@@ -1,16 +1,16 @@
-GitHub-Flask
+Onshape-Flask
 ============
 
-.. module:: flask_github
+.. module:: flask_onshape
 
-GitHub-Flask is an extension to `Flask`_ that allows you authenticate your
-users via GitHub using `OAuth`_ protocol and call `GitHub API`_ methods.
+Onshape-Flask is an extension to `Flask`_ that allows you authenticate your
+users via Onshape using `OAuth`_ protocol and call `Onshape API`_ methods.
 
-GitHub-Flask depends on the `requests`_ library.
+Onshape-Flask depends on the `requests`_ library.
 
 .. _Flask: http://flask.pocoo.org/
 .. _OAuth: http://oauth.net/
-.. _GitHub API: http://developer.github.com/v3/
+.. _Onshape API: http://developer.onshape.com/v3/
 .. _requests: http://python-requests.org/
 
 
@@ -21,84 +21,84 @@ Install the extension with the following command:
 
 .. code-block:: bash
 
-    $ pip install GitHub-Flask
+    $ pip install Onshape-Flask
 
 
 Configuration
 -------------
 
-Here’s an example of how GitHub-Flask is typically initialized and configured:
+Here’s an example of how Onshape-Flask is typically initialized and configured:
 
 .. code-block:: python
 
     from flask import Flask
-    from flask_github import GitHub
+    from flask_onshape import Onshape
 
     app = Flask(__name__)
-    app.config['GITHUB_CLIENT_ID'] = 'XXX'
-    app.config['GITHUB_CLIENT_SECRET'] = 'YYY'
+    app.config['ONSHAPE_CLIENT_ID'] = 'XXX'
+    app.config['ONSHAPE_CLIENT_SECRET'] = 'YYY'
 
-    # For GitHub Enterprise
-    app.config['GITHUB_BASE_URL'] = 'https://HOSTNAME/api/v3/'
-    app.config['GITHUB_AUTH_URL'] = 'https://HOSTNAME/login/oauth/'
+    # For Onshape Enterprise
+    app.config['ONSHAPE_BASE_URL'] = 'https://HOSTNAME/api/v3/'
+    app.config['ONSHAPE_AUTH_URL'] = 'https://HOSTNAME/login/oauth/'
 
-    github = GitHub(app)
+    onshape = Onshape(app)
 
-The following configuration settings exist for GitHub-Flask:
+The following configuration settings exist for Onshape-Flask:
 
 =================================== ==========================================
-`GITHUB_CLIENT_ID`                  Your GitHub application's client id. Go to
-                                    https://github.com/settings/applications
+`ONSHAPE_CLIENT_ID`                  Your Onshape application's client id. Go to
+                                    https://onshape.com/settings/applications
                                     to register new application.
 
-`GITHUB_CLIENT_SECRET`              Your GitHub application's client secret.
+`ONSHAPE_CLIENT_SECRET`              Your Onshape application's client secret.
 
-`GITHUB_BASE_URL`                   Base URL for API requests. Override this
-                                    to use with GitHub Enterprise. Default is
-                                    "https://api.github.com/".
+`ONSHAPE_BASE_URL`                   Base URL for API requests. Override this
+                                    to use with Onshape Enterprise. Default is
+                                    "https://api.onshape.com/".
 
-`GITHUB_AUTH_URL`                   Base authentication endpoint. Override this
-                                    to use with GitHub Enterprise. Default is
-                                    "https://github.com/login/oauth/".
+`ONSHAPE_AUTH_URL`                   Base authentication endpoint. Override this
+                                    to use with Onshape Enterprise. Default is
+                                    "https://onshape.com/login/oauth/".
 =================================== ==========================================
 
 
 Authenticating / Authorizing Users
 ----------------------------------
 
-To authenticate your users with GitHub simply call
-:meth:`~flask_github.GitHub.authorize` at your login handler:
+To authenticate your users with Onshape simply call
+:meth:`~flask_onshape.Onshape.authorize` at your login handler:
 
 .. code-block:: python
 
     @app.route('/login')
     def login():
-        return github.authorize()
+        return onshape.authorize()
 
 
-It will redirect the user to GitHub. If the user accepts the authorization
-request GitHub will redirect the user to your callback URL with the
+It will redirect the user to Onshape. If the user accepts the authorization
+request Onshape will redirect the user to your callback URL with the
 OAuth ``code`` parameter. Then the extension will make another request to
-GitHub to obtain access token and call your
-:meth:`~flask_github.GitHub.authorized_handler` function with that token.
+Onshape to obtain access token and call your
+:meth:`~flask_onshape.Onshape.authorized_handler` function with that token.
 If the authorization fails ``oauth_token`` parameter will be ``None``:
 
 .. code-block:: python
 
-    @app.route('/github-callback')
-    @github.authorized_handler
+    @app.route('/onshape-callback')
+    @onshape.authorized_handler
     def authorized(oauth_token):
         next_url = request.args.get('next') or url_for('index')
         if oauth_token is None:
             flash("Authorization failed.")
             return redirect(next_url)
 
-        user = User.query.filter_by(github_access_token=oauth_token).first()
+        user = User.query.filter_by(onshape_access_token=oauth_token).first()
         if user is None:
             user = User(oauth_token)
             db_session.add(user)
 
-        user.github_access_token = oauth_token
+        user.onshape_access_token = oauth_token
         db_session.commit()
         return redirect(next_url)
 
@@ -109,28 +109,28 @@ behalf of the user.
 Invoking Remote Methods
 -----------------------
 
-We need to register a function as a token getter for Github-Flask extension.
+We need to register a function as a token getter for Onshape-Flask extension.
 It will be called automatically by the extension to get the access token of
 the user. It should return the access token or ``None``:
 
 .. code-block:: python
 
-    @github.access_token_getter
+    @onshape.access_token_getter
     def token_getter():
         user = g.user
         if user is not None:
-            return user.github_access_token
+            return user.onshape_access_token
 
 After setting up you can use the
-:meth:`~flask_github.GitHub.get`,  :meth:`~flask_github.GitHub.post`
-or other verb methods of the :class:`~flask_github.GitHub` object.
+:meth:`~flask_onshape.Onshape.get`,  :meth:`~flask_onshape.Onshape.post`
+or other verb methods of the :class:`~flask_onshape.Onshape` object.
 They will return a dictionary representation of the given API endpoint.
 
 .. code-block:: python
 
     @app.route('/repo')
     def repo():
-        repo_dict = github.get('repos/cenkalti/github-flask')
+        repo_dict = onshape.get('repos/cenkalti/onshape-flask')
         return str(repo_dict)
 
 
@@ -140,7 +140,7 @@ Full Example
 A full example can be found in `example.py`_ file.
 Install the required `Flask-SQLAlchemy`_ package first.
 Then edit the file and change
-``GITHUB_CLIENT_ID`` and ``GITHUB_CLIENT_SECRET`` settings.
+``ONSHAPE_CLIENT_ID`` and ``ONSHAPE_CLIENT_SECRET`` settings.
 Then you can run it as a python script:
 
 .. code-block:: bash
@@ -148,14 +148,14 @@ Then you can run it as a python script:
     $ pip install Flask-SQLAlchemy
     $ python example.py
 
-.. _example.py: https://github.com/cenkalti/github-flask/blob/master/example.py
+.. _example.py: https://onshape.com/cenkalti/onshape-flask/blob/master/example.py
 .. _Flask-SQLAlchemy: http://pythonhosted.org/Flask-SQLAlchemy/
 
 API Reference
 -------------
 
-.. autoclass:: GitHub
+.. autoclass:: Onshape
    :members:
 
-.. autoclass:: GitHubError
+.. autoclass:: OnshapeError
    :members:
